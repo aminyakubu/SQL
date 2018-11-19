@@ -26,48 +26,42 @@ SELECT COUNT( DISTINCT country_id) AS num_country
 # Question 4 - Which actor did the most films?
 # 42 films - GINA DEGENERES
 
-SELECT a.actor_id, first_name, last_name, COUNT(film_id) AS number_of_films
+SELECT a.actor_id, a.first_name, a.last_name, COUNT(f.film_id) AS num_films
+FROM actor AS a
+	INNER JOIN film_actor AS f
+	ON a.actor_id = f.actor_id
+GROUP BY a.actor_id, a.first_name, a.last_name
+HAVING num_films = (
+	SELECT COUNT(f.film_id) AS num_films
 	FROM actor AS a
-		INNER JOIN film_actor AS fa
-			ON a.actor_id = fa.actor_id
-	GROUP BY  a.actor_id, first_name, last_name
-    ORDER BY COUNT(film_id) DESC
-    LIMIT 1;
+		INNER JOIN film_actor AS f
+		ON a.actor_id = f.actor_id
+	GROUP BY a.actor_id, a.first_name, a.last_name
+	ORDER BY num_films DESC
+    LIMIT 1);*/
     
 #Question 5 - Which actor did the most action films? List the top actor by name, along with their number of action films 
 # Hopkins Natalie has the highest number of action movies. 6 in total
 
-SELECT actor_id, last_name, first_name, COUNT(d2.category_id) AS total_number
-FROM (
-	SELECT d.actor_id, d.film_id, d.category_id, a.first_name, a.last_name 
-		FROM(
-			SELECT actor_id, fa.film_id, category_id
-				FROM film_actor AS fa
-		INNER JOIN film_category AS fc
-			ON fa.film_id = fc.film_id) AS d
-	INNER JOIN actor 	AS a
-		ON d.actor_id = a.actor_id) as d2
-	INNER JOIN category as c
-		ON c.category_id = d2.category_id
-	WHERE d2.category_id = 1
-	GROUP BY actor_id, last_name, first_name
-	ORDER BY COUNT(d2.category_id) DESC
-	LIMIT 1;
-
-###Alternate Query
-
-SELECT a.actor_id, last_name, first_name, COUNT(fc.category_id) AS total_number
-	FROM film_actor AS fa
-	JOIN film_category AS fc
-		ON fa.film_id = fc.film_id 
-	JOIN actor AS a
-		ON a.actor_id = fa.actor_id
-	INNER JOIN category as c
-		ON c.category_id = fc.category_id
-	WHERE fc.category_id = 1
-	GROUP BY a.actor_id, last_name, first_name
-	ORDER BY COUNT(fc.category_id) DESC
-	LIMIT 1;
+SELECT a.actor_id, a.first_name, a.last_name, COUNT(f.film_id) AS num_action_films
+FROM actor AS a
+	INNER JOIN film_actor AS f
+	ON a.actor_id = f.actor_id
+	INNER JOIN film_category AS c
+	ON f.film_id = c.film_id
+WHERE c.category_id = 1
+GROUP BY a.actor_id, a.first_name, a.last_name
+HAVING num_action_films = (
+	SELECT COUNT(f.film_id) AS num_action_films
+	FROM actor AS a
+		INNER JOIN film_actor AS f
+		ON a.actor_id = f.actor_id
+		INNER JOIN film_category AS c
+		ON f.film_id = c.film_id
+	WHERE category_id = 1
+	GROUP BY a.actor_id, a.first_name, a.last_name
+	ORDER BY num_action_films DESC
+	LIMIT 1);
  
  # Question 6 - Which category of films has the smallest number of records recorded in the database? Give the name of the category and not the id number.
  #Music category has the smallest number of records recorded in the database
