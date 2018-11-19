@@ -82,11 +82,12 @@ SELECT a.actor_id, last_name, first_name, COUNT(fc.category_id) AS total_number
  # Question 7 - What is the longest movie in the database? (If multiple movies tied for longest, list all movies)
  # There are 10 longest movies (tie) -- Darn forrester, pond seattle, chicago north, muscle bright, worst banger, gangs pride, soldiers evolution, home pity, 
  #sweet brotherhood and control anthem
- 
-SELECT film_id, title, length 
-	FROM film
-	ORDER BY length DESC
-	LIMIT 10;
+ 	
+SELECT title, length
+FROM film
+WHERE length = (
+	SELECT MAX(length) 
+    FROM film);
  
 #Question 8 - What is the average running time of each category of movie?
 # The averages are listed in the query table
